@@ -1,0 +1,259 @@
+<HTML>
+<head>
+	<title>ASCII Chart</title>
+	<meta charset="UTF-8">
+	<!-- Ben Fields (c) 2018 -->
+	<style>
+		body {
+			display: flex;
+			justify-content: center;
+			background-color: #FDFDFD;
+			padding: 0;
+			margin: 0;
+			padding-bottom: 20px;
+			padding-top: 35px;
+		}
+		.spacer {
+			width: 5%;
+		}
+		.chart-container {
+			width: 30%;
+			font-size: 18px;
+		}
+		.chart {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+		}
+		.row {
+			display: flex;
+			flex-direction: row;
+		}
+		.row:nth-child(odd) {
+			background-color: #F7F7F7;
+		}
+		.row * {
+			border-radius: 8px;
+			padding: 2px;
+			padding-left: 10px;
+			position: relative;
+		}
+		.char {
+			flex: 1;
+			color: #000756FF;
+		}
+		.dec {
+			flex: 1;
+			color: #5E1B0CFF;
+		}
+		.hex {
+			flex: 1;
+			color: #697862FF;
+		}
+		.name {
+			flex: 3;
+		}
+		.char:hover, .dec:hover, .hex:hover {
+			box-shadow: 0px 0px 4px 4px #F0F0F0;
+			cursor: pointer;
+			background-color: #FAFAFA;
+		}
+		::selection {
+			background-color: lightblue;
+		}
+		::-moz-selection {
+			background-color: lightblue;
+		}
+		.titles {
+			position: fixed;
+			width: inherit;
+			top: 0;
+			background-color: #FAFAFA;
+			box-shadow: 0px 2px 2px #EEEEEE;
+		}
+		.char-h {
+			flex: 1;
+		}
+		.dec-h {
+			flex: 1;
+		}
+		.hex-h {
+			flex: 1;
+		}
+		.name-h {
+			flex: 3;
+		}
+		#bg {
+			position: fixed;
+			left: 0;
+			top: 0;
+			margin-left: 12px;
+			color: #EEEEEE;
+			font-size: 80px;
+			z-index: -1;
+			line-height: 60px;
+			transform-origin: bottom left;
+			transform: rotate(90deg) translate(-50px, 0);
+		}
+		@keyframes focus {
+			from { box-shadow: 0px 0px 4px 4px lightblue; }
+			to { box-shadow: 0px 0px 4px 4px transparent; }
+		}
+		.focus {
+			animation-name: focus;
+			animation-duration: 2s;
+		}
+		.link {
+			font-size: 25px;
+			color: #CCCCCC;
+			position: fixed;
+			margin-right: 20px;
+			margin-bottom: 15px;
+			bottom: 0;
+			right: 0;
+			transition: color 0.1s;
+		}
+		.link:visited {
+			color: #CCCCCC;
+		}
+		.link:hover {
+			color: #AFAFAF;
+		}
+		@media only screen and (max-width: 900px) {
+			body {
+				flex-direction: column;
+				align-items: center;
+			}
+			.chart-container {
+				width: 100%;
+				font-size: 14px;
+			}
+			#bg {
+				display: none;
+			}
+			.link {
+				font-size: 20px;
+				background-color: #FDFDFDCC;
+			}
+			.dec, .dec-h {
+				flex: 0.5;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div id = "bg">ASCII Chart</div>
+	<div class = "chart-container">
+		<div class = "chart">
+			<!-- Content generated here -->
+		</div>
+		<div class = "row titles">
+			<div class = "char-h">Char</div>
+			<div class = "dec-h">Decimal</div>
+			<div class = "hex-h">Hex</div>
+			<div class = "name-h">Name</div>
+		</div>
+	</div>
+	<div class = "spacer"></div>
+	<div class = "chart-container">
+		<div class = "chart">
+			<!-- Content generated here -->
+		</div>
+		<div class = "row titles">
+			<div class = "char-h">Char</div>
+			<div class = "dec-h">Decimal</div>
+			<div class = "hex-h">Hex</div>
+			<div class = "name-h">Name</div>
+		</div>
+	</div>
+	<a class = "link" href = "./ASCII_Table.txt">Plain Text ASCII Table</a>
+
+	<script>
+		//Get divs to place chart in
+		var chart = document.getElementsByClassName("chart");
+		//Load chart from file and parse it
+		fetch("ASCII_Table.txt").then(function(response) {
+			response.text().then(function(text) {
+				//Regular expression to find row in chart & extract info
+				var reg = /(?:\r|\n|^)(\S+)[\t \|]*(\d+)[\t \|]*(0x[\da-f]+)[\t \|]*(.*)/g ;
+				//Array to hold extracted info
+				var arr;
+
+				//Function to copy contents easily on click
+				var clickCopy = function(event) {
+					var elem = event.target;
+					var range = document.createRange();
+					range.selectNode(elem);
+					window.getSelection().addRange(range);
+					document.execCommand("copy");
+					//window.getSelection().removeRange(range);
+				}
+
+				//Add an html element for every row/match
+				var i = 0;
+				while ( (arr = reg.exec(text)) !== null) {
+					var rw = document.createElement("div");
+					rw.className = "row";
+					//Char
+					var ch = document.createElement("div");
+					ch.className = "char";
+					ch.id = "c" + arr[2];
+					ch.innerHTML = arr[1];
+					ch.addEventListener('click', clickCopy);
+					//Anchor
+					var ar = document.createElement("div");
+					ar.className = "anchor";
+					ar.id = "char_" + arr[2];
+					ar.style.position = "absolute";
+					ar.style.top = "-45vh";
+					ch.appendChild(ar);
+					rw.appendChild(ch);
+					//Dec
+					var dc = document.createElement("div");
+					dc.className = "dec";
+					dc.innerHTML = arr[2];
+					dc.addEventListener('click', clickCopy);
+					rw.appendChild(dc);
+					//Hex
+					var hx = document.createElement("div");
+					hx.className = "hex";
+					hx.innerHTML = arr[3];
+					hx.addEventListener('click', clickCopy);
+					rw.appendChild(hx);
+					//Desc
+					var ds = document.createElement("div");
+					ds.className = "name";
+					if (arr[4])
+						ds.innerHTML = arr[4];
+					else
+						ds.innerHTML = arr[1];
+					rw.appendChild(ds);
+					//Add row to chart
+					if (i < 64)
+						chart[0].appendChild(rw);
+					else
+						chart[1].appendChild(rw);
+					i++;
+				}
+			});
+		});
+
+		//Jump to character when typed
+		var focus = null;
+		var jumpToKey = function(event) {
+			var key = event.which;
+			if (key < 128) {
+				if (focus)
+					focus.className = focus.className.replace(" focus", "");
+				focus = document.getElementById("c" + key);
+				focus.className += " focus";
+				window.location.replace("#char_" + key);
+				event.preventDefault();
+			}
+		}
+		document.addEventListener('keypress', jumpToKey);
+	</script>
+	<!-- Ben Fields (c) 2018 -->
+</body>
+</HTML>
